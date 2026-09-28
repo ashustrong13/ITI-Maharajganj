@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bonafide Certificate Generator</title>
+
+<style>
+
+/* =========================
+   GENERAL PAGE
+========================= */
+
+body{
+    margin:0;
+    padding:20px;
+    background:#eeeeee;
+    font-family:"Times New Roman", serif;
+    color:#000;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.form-box{
+    background:white;
+    padding:25px;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    margin-bottom:25px;
+}
+
+.form-box h2{
+    text-align:center;
+    margin-top:0;
+    margin-bottom:25px;
+}
+
+.form-group{
+    margin-bottom:14px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+input{
+    width:100%;
+    padding:9px;
+    font-size:16px;
+    border:1px solid #999;
+    border-radius:4px;
+    box-sizing:border-box;
+}
+
+.generate-btn{
+    background:#0d6efd;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    font-size:16px;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.generate-btn:hover{
+    background:#084298;
+}
+
+
+/* =========================
+   CERTIFICATE
+========================= */
+
+.certificate{
+
+    display:none;
+
+    width:210mm;
+    min-height:297mm;
+
+    margin:20px auto;
+
+    padding:15mm 18mm;
+
+    box-sizing:border-box;
+
+    background:white;
+
+    box-shadow:0 0 10px rgba(0,0,0,0.20);
+}
+
+
+/* Header image */
+
+.header-image{
+    display:block;
+    width:100%;
+    height:auto;
+    margin-bottom:12px;
+}
+
+
+/* Letter number and date */
+
+.letter-details{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:17px;
+
+    margin-top:5px;
+
+    margin-bottom:15px;
+}
+
+
+/* Heading */
+
+.certificate-title{
+
+    text-align:center;
+
+    font-size:25px;
+
+    font-weight:bold;
+
+    text-decoration:underline;
+
+    margin-top:10px;
+
+    margin-bottom:30px;
+}
+
+
+/* Main content */
+
+.content{
+
+    font-size:18px;
+
+    line-height:2;
+
+    text-align:justify;
+}
+
+
+/* Student details */
+
+.student-details{
+
+    margin-top:15px;
+
+    margin-left:20px;
+
+    line-height:2.1;
+
+}
+
+
+/* Signature */
+
+.signature{
+
+    margin-top:70px;
+
+    margin-left:auto;
+
+    width:280px;
+
+    text-align:center;
+
+    font-size:17px;
+
+    line-height:1.7;
+}
+
+
+/* Print button */
+
+.print-btn{
+
+    background:#198754;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 22px;
+
+    font-size:16px;
+
+    border-radius:5px;
+
+    cursor:pointer;
+
+    margin-top:30px;
+}
+
+.print-btn:hover{
+    background:#146c43;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:850px){
+
+    body{
+        padding:10px;
+    }
+
+    .certificate{
+        width:100%;
+        min-height:auto;
+        padding:25px;
+    }
+
+    .content{
+        font-size:16px;
+    }
+
+    .letter-details{
+        font-size:15px;
+    }
+
+}
+
+
+/* =========================
+   PRINT
+========================= */
+
+@media print{
+
+    body{
+        background:white;
+        padding:0;
+        margin:0;
+    }
+
+    .form-box{
+        display:none !important;
+    }
+
+    .certificate{
+
+        display:block !important;
+
+        width:210mm;
+
+        min-height:297mm;
+
+        margin:0;
+
+        padding:15mm 18mm;
+
+        box-shadow:none;
+
+    }
+
+    .print-btn{
+        display:none !important;
+    }
+
+    @page{
+
+        size:A4;
+
+        margin:0;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<!-- =====================================================
+     DATA ENTRY FORM
+===================================================== -->
+
+<div class="form-box">
+
+<h2>Bonafide Certificate Generator</h2>
+
+
+<div class="form-group">
+
+<label>Letter No.</label>
+
+<input
+type="text"
+id="letterNo"
+placeholder="Enter Letter No."
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Date</label>
+
+<input
+type="date"
+id="letterDate"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Student Name</label>
+
+<input
+type="text"
+id="studentName"
+placeholder="Enter Student Name"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Registration No.</label>
+
+<input
+type="text"
+id="regNo"
+placeholder="Enter Registration Number"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Session</label>
+
+<input
+type="text"
+id="session"
+placeholder="Example: 2025-27"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Trade</label>
+
+<input
+type="text"
+id="trade"
+placeholder="Enter Trade"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Academic Session</label>
+
+<input
+type="text"
+id="academicSession"
+placeholder="Example: 2025-26"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Date of Birth</label>
+
+<input
+type="text"
+id="dob"
+placeholder="DD-MM-YYYY"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Father's Name</label>
+
+<input
+type="text"
+id="fatherName"
+placeholder="Enter Father's Name"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Mother's Name</label>
+
+<input
+type="text"
+id="motherName"
+placeholder="Enter Mother's Name"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Date of Admission</label>
+
+<input
+type="text"
+id="admissionDate"
+placeholder="DD-MM-YYYY"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Expected Year of Course Completion</label>
+
+<input
+type="text"
+id="completionYear"
+placeholder="Example: 2027"
+>
+
+</div>
+
+
+<button
+class="generate-btn"
+onclick="generateCertificate()">
+
+Generate Certificate
+
+</button>
+
+</div>
+
+
+
+<!-- =====================================================
+     FINAL CERTIFICATE
+===================================================== -->
+
+<div
+id="certificate"
+class="certificate"
+>
+
+
+<!-- HEADER IMAGE -->
+
+<img
+src="header.png"
+class="header-image"
+alt="Institute Header"
+>
+
+
+<!-- LETTER DETAILS -->
+
+<div class="letter-details">
+
+<div>
+
+<strong>Letter No.:</strong>
+
+<span id="cLetterNo"></span>
+
+</div>
+
+
+<div>
+
+<strong>Date:  </strong>
+
+<span id="cLetterDate"></span>
+
+</div>
+
+</div>
+
+
+<!-- TITLE -->
+
+<div class="certificate-title">
+
+BONAFIDE CERTIFICATE
+
+</div>
+
+
+<!-- MAIN CONTENT -->
+
+<div class="content">
+
+
+<p>
+
+This is to certify that Mr./Ms.
+
+<strong id="cStudentName">
+</strong>,
+
+bearing Registration No.
+
+<strong id="cRegNo">
+</strong>
+
+is a Bonafide student of this institute,
+
+studying in the session
+
+<strong id="cSession">
+</strong>,
+
+Trade -
+
+<strong id="cTrade">
+</strong>
+
+during Academic Session
+
+<strong id="cAcademicSession">
+</strong>.
+
+</p>
+
+
+
+<p>
+
+The student details as entered in our institute record are:
+
+</p>
+
+
+
+<div class="student-details">
+
+<strong>Date of Birth :</strong>
+
+<span id="cDob"></span>
+
+<br>
+
+
+<strong>Father's Name :</strong>
+
+<span id="cFatherName"></span>
+
+<br>
+
+
+<strong>Mother's Name :</strong>
+
+<span id="cMotherName"></span>
+
+<br>
+
+
+<strong>Date of Admission :</strong>
+
+<span id="cAdmissionDate"></span>
+
+<br>
+
+
+<strong>Expected Year of Course Completion :</strong>
+
+<span id="cCompletionYear"></span>
+
+</div>
+
+
+</div>
+
+
+
+<!-- SIGNATURE -->
+
+<div class="signature">
+
+<br>
+
+<strong>
+Authorized Signature with Stamp
+</strong>
+
+<br><br>
+Name:- Ashutosh Kumar Singh
+<br>
+
+Designation:- Vice-Principal
+
+<br>
+
+Mobile No.:- 8800175018
+
+</div>
+
+
+
+<!-- PRINT BUTTON -->
+
+<div style="text-align:center;">
+
+<button
+class="print-btn"
+onclick="window.print()">
+
+🖨 Print / Save PDF
+
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+function formatDate(dateValue){
+
+    if(!dateValue){
+        return "";
+    }
+
+    let parts = dateValue.split("-");
+
+    if(parts.length !== 3){
+        return dateValue;
+    }
+
+    return parts[2] + "-" +
+           parts[1] + "-" +
+           parts[0];
+
+}
+
+
+
+function generateCertificate(){
+
+
+    /* Letter details */
+
+    document.getElementById("cLetterNo").innerText =
+        document.getElementById("letterNo").value;
+
+
+    document.getElementById("cLetterDate").innerText =
+        formatDate(
+            document.getElementById("letterDate").value
+        );
+
+
+
+    /* Student details */
+
+    document.getElementById("cStudentName").innerText =
+        document.getElementById("studentName").value;
+
+
+    document.getElementById("cRegNo").innerText =
+        document.getElementById("regNo").value;
+
+
+    document.getElementById("cSession").innerText =
+        document.getElementById("session").value;
+
+
+    document.getElementById("cTrade").innerText =
+        document.getElementById("trade").value;
+
+
+    document.getElementById("cAcademicSession").innerText =
+        document.getElementById("academicSession").value;
+
+
+    document.getElementById("cDob").innerText =
+        document.getElementById("dob").value;
+
+
+    document.getElementById("cFatherName").innerText =
+        document.getElementById("fatherName").value;
+
+
+    document.getElementById("cMotherName").innerText =
+        document.getElementById("motherName").value;
+
+
+    document.getElementById("cAdmissionDate").innerText =
+        document.getElementById("admissionDate").value;
+
+
+    document.getElementById("cCompletionYear").innerText =
+        document.getElementById("completionYear").value;
+
+
+
+    /* Show certificate */
+
+    document.getElementById("certificate").style.display =
+        "block";
+
+
+    /* Scroll to certificate */
+
+    document.getElementById("certificate").scrollIntoView({
+        behavior:"smooth"
+    });
+
+}
+
+</script>
+
+
+</body>
+
+</html>
