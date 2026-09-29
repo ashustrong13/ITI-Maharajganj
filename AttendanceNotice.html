@@ -1,0 +1,1224 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Attendance Warning Notice Generator</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f2f2f2;
+    font-family: "Noto Sans Devanagari", "Mangal", Arial, sans-serif;
+    color: #111;
+}
+
+/* ================= FORM ================= */
+
+.form-container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+
+h1 {
+    text-align: center;
+    margin-top: 0;
+    font-size: 24px;
+}
+
+.section-title {
+    background: #eeeeee;
+    padding: 9px 12px;
+    font-weight: bold;
+    margin: 20px 0 12px;
+    border-left: 5px solid #333;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+textarea {
+    min-height: 70px;
+    resize: vertical;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+/* Attendance table */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    border: 1px solid #555;
+    padding: 7px;
+    text-align: center;
+}
+
+th {
+    background: #eeeeee;
+}
+
+.attendance-input {
+    border: none;
+    text-align: center;
+    padding: 5px;
+    border-radius: 0;
+}
+
+.percentage {
+    font-weight: bold;
+    background: #f7f7f7;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    padding: 12px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.generate {
+    background: #222;
+    color: white;
+}
+
+.reset {
+    background: #ddd;
+    color: #111;
+}
+
+/* ================= NOTICE ================= */
+
+#notice {
+    display: none;
+}
+
+/* ================= PRINT ================= */
+
+@media print {
+
+    body {
+        background: white;
+    }
+
+    .form-container {
+        display: none !important;
+    }
+
+    #notice {
+        display: block !important;
+    }
+
+    @page {
+        size: A4;
+        margin: 12mm 18mm 15mm 18mm;
+    }
+
+    .notice-page {
+        width: 100%;
+        min-height: 270mm;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Header image */
+
+    .letterhead {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    .letterhead img {
+        width: 100%;
+        max-height: 42mm;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .header-line {
+        border-top: 1.5px solid #111;
+        margin-top: 5px;
+        margin-bottom: 8px;
+    }
+
+    /* Letter number/date */
+
+    .letter-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .notice-title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 17px;
+        margin: 12px 0 15px;
+        text-decoration: underline;
+    }
+
+    .recipient {
+        margin-bottom: 12px;
+    }
+
+    .subject {
+        font-weight: bold;
+        margin: 12px 0;
+    }
+
+    .notice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 15px;
+    }
+
+    .notice-table th,
+    .notice-table td {
+        border: 1px solid #111;
+        padding: 6px;
+        text-align: center;
+    }
+
+    .notice-table th {
+        font-weight: bold;
+    }
+
+    .signature {
+        margin-top: 35px;
+        text-align: right;
+        line-height: 1.4;
+    }
+
+    .copy {
+        margin-top: 25px;
+    }
+
+    .copy ol {
+        margin-top: 5px;
+    }
+
+}
+
+
+/* Mobile form */
+
+@media screen and (max-width: 650px) {
+
+    .form-container {
+        margin: 0;
+        border-radius: 0;
+        padding: 15px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+    th,
+    td {
+        padding: 5px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     FORM
+====================================================== -->
+
+<div class="form-container">
+
+    <h1>Attendance Warning Notice Generator</h1>
+
+
+    <!-- LETTER DETAILS -->
+
+    <div class="section-title">
+        1. पत्र का विवरण
+    </div>
+
+    <div class="grid">
+
+        <div class="field">
+
+            <label>
+                पत्रांक
+            </label>
+
+            <input
+                type="text"
+                id="letterNo"
+                placeholder="पत्रांक दर्ज करें"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                दिनांक
+            </label>
+
+            <input
+                type="date"
+                id="letterDate"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- STUDENT DETAILS -->
+
+    <div class="section-title">
+        2. प्रशिक्षणार्थी का विवरण
+    </div>
+
+    <div class="grid">
+
+
+        <div class="field">
+
+            <label>
+                प्रशिक्षणार्थी का नाम *
+            </label>
+
+            <input
+                type="text"
+                id="studentName"
+                placeholder="नाम"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                पिता/अभिभावक का नाम
+            </label>
+
+            <input
+                type="text"
+                id="fatherName"
+                placeholder="पिता/अभिभावक का नाम"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                व्यवसाय (Trade) *
+            </label>
+
+            <input
+                type="text"
+                id="trade"
+                placeholder="जैसे: Electrician"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                सत्र
+            </label>
+
+            <input
+                type="text"
+                id="session"
+                placeholder="जैसे: 2026-28"
+            >
+
+        </div>
+
+
+        <div class="field full">
+
+            <label>
+                पता
+            </label>
+
+            <textarea
+                id="address"
+                placeholder="प्रशिक्षणार्थी का पूरा पता"
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- ATTENDANCE -->
+
+    <div class="section-title">
+        3. माहवार उपस्थिति
+    </div>
+
+
+    <table id="attendanceTable">
+
+        <thead>
+
+            <tr>
+
+                <th>क्रम</th>
+
+                <th>माह</th>
+
+                <th>कुल कार्य दिवस</th>
+
+                <th>उपस्थित दिवस</th>
+
+                <th>अनुपस्थित दिवस</th>
+
+                <th>उपस्थिति %</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+            <!-- ROW 1 -->
+
+            <tr>
+
+                <td>1</td>
+
+                <td>
+                    <input
+                        type="text"
+                        class="month attendance-input"
+                        placeholder="माह"
+                    >
+                </td>
+
+                <td>
+                    <input
+                        type="number"
+                        class="total attendance-input"
+                        min="0"
+                        oninput="calculateRow(this)"
+                    >
+                </td>
+
+                <td>
+                    <input
+                        type="number"
+                        class="present attendance-input"
+                        min="0"
+                        oninput="calculateRow(this)"
+                    >
+                </td>
+
+                <td class="absent">
+                    0
+                </td>
+
+                <td class="percentage">
+                    0.00%
+                </td>
+
+            </tr>
+
+
+        </tbody>
+
+    </table>
+
+
+    <!-- NOTICE SETTINGS -->
+
+    <div class="section-title">
+        4. Notice Settings
+    </div>
+
+
+    <div class="grid">
+
+
+        <div class="field">
+
+            <label>
+                न्यूनतम अनिवार्य उपस्थिति (%)
+            </label>
+
+            <input
+                type="number"
+                id="requiredAttendance"
+                value="90"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                स्पष्टीकरण हेतु अवधि (दिन)
+            </label>
+
+            <input
+                type="number"
+                id="replyDays"
+                value="7"
+            >
+
+        </div>
+
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+        <button
+            class="generate"
+            onclick="generateNotice()"
+        >
+            Generate & Print
+        </button>
+
+
+        <button
+            class="reset"
+            onclick="location.reload()"
+        >
+            Reset
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     PRINTABLE NOTICE
+====================================================== -->
+
+<div id="notice">
+
+    <div class="notice-page">
+
+
+        <!-- HEADER IMAGE -->
+
+        <div class="letterhead">
+
+            <img
+                src="header.png"
+                alt="Official Header"
+            >
+
+        </div>
+
+
+     
+
+
+        <!-- LETTER INFORMATION -->
+
+        <div class="letter-info">
+
+            <div>
+
+                <strong>पत्रांक :</strong>
+
+                <span id="pLetterNo"></span>
+
+            </div>
+
+
+            <div>
+
+                <strong>दिनांक :</strong>
+
+                <span id="pLetterDate"></span>
+
+            </div>
+
+        </div>
+
+
+        <!-- TITLE -->
+
+        <div class="notice-title">
+
+            प्रथम चेतावनी पत्र
+
+        </div>
+
+
+        <!-- RECIPIENT -->
+
+        <div class="recipient">
+
+            <strong>प्रति,</strong>
+
+            <br>
+
+
+            श्री/सुश्री :
+            <strong id="pStudentName"></strong>
+
+            <br>
+
+
+            पिता/अभिभावक :
+            <strong id="pFatherName"></strong>
+
+            <br>
+
+
+            व्यवसाय (Trade) :
+            <strong id="pTrade"></strong>
+
+            <br>
+
+
+            सत्र :
+            <strong id="pSession"></strong>
+
+            <br>
+
+
+            पता :
+            <span id="pAddress"></span>
+
+        </div>
+
+
+        <!-- SUBJECT -->
+
+        <div class="subject">
+
+            विषय : प्रशिक्षण में अनियमित उपस्थिति के संबंध में प्रथम चेतावनी।
+
+        </div>
+
+
+        <p>
+            महोदय/महोदया,
+        </p>
+
+
+        <p>
+
+            यह सूचित किया जाता है कि आप इस संस्थान के व्यवसाय
+            <strong id="pTrade2"></strong>
+            के प्रशिक्षणार्थी हैं। संस्थान के उपस्थिति अभिलेख के अनुसार
+            आपकी उपस्थिति निर्धारित मानक से कम पाई गई है तथा आप प्रशिक्षण
+            में नियमित रूप से उपस्थित नहीं हो रहे हैं।
+
+        </p>
+
+
+        <p>
+
+            प्रशिक्षणार्थियों के लिए निर्धारित
+            <strong id="pRequired">90%</strong>
+            उपस्थिति बनाए रखना आवश्यक है। कम उपस्थिति के कारण प्रशिक्षणार्थी
+            को परीक्षा में सम्मिलित होने में कठिनाई हो सकती है तथा निर्धारित
+            उपस्थिति पूर्ण नहीं करने की स्थिति में नियमानुसार कार्रवाई की
+            जा सकती है।
+
+        </p>
+
+
+        <p>
+
+            <strong>
+                माह <span id="pMonth"></span> में आपकी उपस्थिति का विवरण निम्नवत् है :
+            </strong>
+
+        </p>
+
+
+        <!-- ATTENDANCE TABLE -->
+
+        <table class="notice-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        कुल कार्य दिवस
+                    </th>
+
+                    <th>
+                        उपस्थित दिवस
+                    </th>
+
+                    <th>
+                        अनुपस्थित दिवस
+                    </th>
+
+                    <th>
+                        उपस्थिति प्रतिशत
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="printAttendanceBody">
+
+            </tbody>
+
+        </table>
+
+
+        <p>
+
+            अतः आपको इस पत्र के माध्यम से
+            <strong>प्रथम चेतावनी</strong>
+            दी जाती है कि आप इस पत्र की प्राप्ति के
+            <strong>
+                <span id="pReplyDays">07</span> दिनों
+            </strong>
+            के भीतर संस्थान में उपस्थित होकर अपनी अनुपस्थिति के संबंध में
+            स्पष्टीकरण प्रस्तुत करें तथा नियमित रूप से प्रशिक्षण प्राप्त करें।
+
+        </p>
+
+
+        <p>
+
+            आपको यह भी निर्देशित किया जाता है कि भविष्य में बिना पूर्व
+            अनुमति/सूचना के प्रशिक्षण से अनुपस्थित न रहें तथा निर्धारित
+            उपस्थिति मानक को बनाए रखें। यदि आप नियमित रूप से प्रशिक्षण में
+            उपस्थित नहीं होते हैं, तो आपके विरुद्ध नियमानुसार अग्रेतर
+            कार्रवाई की जाएगी।
+
+        </p>
+
+
+        <!-- SIGNATURE -->
+
+        <div class="signature">
+
+            <strong>
+                प्राचार्य
+            </strong>
+
+            <br>
+
+            राजकीय औद्योगिक प्रशिक्षण संस्थान, 
+                 महाराजगंज, सिवान
+
+        </div>
+
+
+        <!-- COPY -->
+
+        <div class="copy">
+
+            <strong>
+                प्रतिलिपि :
+            </strong>
+
+            <ol>
+
+                <li>
+                    संबंधित अभिभावक को सूचनार्थ।
+                </li>
+
+                <li>
+                    संबंधित अनुदेशक को आवश्यक कार्रवाई हेतु।
+                </li>
+
+                <li>
+                    कार्यालय अभिलेख हेतु।
+                </li>
+
+            </ol>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   CALCULATE ATTENDANCE
+====================================================== */
+
+function calculateRow(input) {
+
+    const row = input.closest("tr");
+
+
+    const total =
+        parseFloat(
+            row.querySelector(".total").value
+        ) || 0;
+
+
+    const present =
+        parseFloat(
+            row.querySelector(".present").value
+        ) || 0;
+
+
+    let absent =
+        total - present;
+
+
+    if (absent < 0) {
+
+        absent = 0;
+
+    }
+
+
+    let percentage = 0;
+
+
+    if (total > 0) {
+
+        percentage =
+            (present / total) * 100;
+
+    }
+
+
+    row.querySelector(".absent").innerText =
+        absent;
+
+
+    row.querySelector(".percentage").innerText =
+        percentage.toFixed(2) + "%";
+
+}
+
+
+
+/* =====================================================
+   DATE FORMAT
+====================================================== */
+
+function formatDate(dateString) {
+
+    if (!dateString) {
+
+        return "";
+
+    }
+
+
+    const date =
+        new Date(dateString);
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+
+    const year =
+        date.getFullYear();
+
+
+    return day + "-" + month + "-" + year;
+
+}
+
+
+
+/* =====================================================
+   HTML ESCAPE
+====================================================== */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+
+    div.textContent = text;
+
+
+    return div.innerHTML;
+
+}
+
+
+
+/* =====================================================
+   GENERATE NOTICE
+====================================================== */
+
+function generateNotice() {
+
+
+    const studentName =
+        document
+        .getElementById("studentName")
+        .value
+        .trim();
+
+
+    const trade =
+        document
+        .getElementById("trade")
+        .value
+        .trim();
+
+
+    if (!studentName || !trade) {
+
+        alert(
+            "कृपया प्रशिक्षणार्थी का नाम और व्यवसाय (Trade) भरें।"
+        );
+
+        return;
+
+    }
+
+
+    /* Letter information */
+
+    document
+        .getElementById("pLetterNo")
+        .innerText =
+        document
+        .getElementById("letterNo")
+        .value;
+
+
+    document
+        .getElementById("pLetterDate")
+        .innerText =
+        formatDate(
+            document
+            .getElementById("letterDate")
+            .value
+        );
+
+
+    /* Student information */
+
+    document
+        .getElementById("pStudentName")
+        .innerText =
+        studentName;
+
+
+    document
+        .getElementById("pFatherName")
+        .innerText =
+        document
+        .getElementById("fatherName")
+        .value;
+
+
+    document
+        .getElementById("pTrade")
+        .innerText =
+        trade;
+
+
+    document
+        .getElementById("pTrade2")
+        .innerText =
+        trade;
+
+
+    document
+        .getElementById("pSession")
+        .innerText =
+        document
+        .getElementById("session")
+        .value;
+
+
+    document
+        .getElementById("pAddress")
+        .innerText =
+        document
+        .getElementById("address")
+        .value;
+
+
+    /* Attendance requirement */
+
+    const required =
+        parseFloat(
+            document
+            .getElementById("requiredAttendance")
+            .value
+        ) || 90;
+
+
+    document
+        .getElementById("pRequired")
+        .innerText =
+        required + "%";
+
+
+    /* Reply days */
+
+    const replyDays =
+        parseInt(
+            document
+            .getElementById("replyDays")
+            .value
+        ) || 7;
+
+
+    document
+        .getElementById("pReplyDays")
+        .innerText =
+        String(replyDays)
+        .padStart(2, "0");
+
+
+    /* Attendance */
+
+    const row =
+        document.querySelector(
+            "#attendanceTable tbody tr"
+        );
+
+
+    const month =
+        row
+        .querySelector(".month")
+        .value
+        .trim();
+
+
+    const total =
+        parseFloat(
+            row
+            .querySelector(".total")
+            .value
+        ) || 0;
+
+
+    const present =
+        parseFloat(
+            row
+            .querySelector(".present")
+            .value
+        ) || 0;
+
+
+    if (!month || total <= 0) {
+
+        alert(
+            "कृपया माह और कुल कार्य दिवस भरें।"
+        );
+
+        return;
+
+    }
+
+
+    if (present > total) {
+
+        alert(
+            "उपस्थित दिवस कुल कार्य दिवस से अधिक नहीं हो सकता।"
+        );
+
+        return;
+
+    }
+
+
+    const absent =
+        total - present;
+
+
+    const percentage =
+        (present / total) * 100;
+
+
+    document
+        .getElementById("pMonth")
+        .innerText =
+        month;
+
+
+    const printBody =
+        document
+        .getElementById("printAttendanceBody");
+
+
+    printBody.innerHTML = "";
+
+
+    const tr =
+        document.createElement("tr");
+
+
+    tr.innerHTML = `
+
+        <td>
+            ${total}
+        </td>
+
+        <td>
+            ${present}
+        </td>
+
+        <td>
+            ${absent}
+        </td>
+
+        <td>
+            ${percentage.toFixed(2)}%
+        </td>
+
+    `;
+
+
+    printBody.appendChild(tr);
+
+
+    /* Show notice */
+
+    document
+        .getElementById("notice")
+        .style.display =
+        "block";
+
+
+    /* Print */
+
+    setTimeout(
+        function() {
+
+            window.print();
+
+        },
+        300
+    );
+
+}
+
+
+
+/* =====================================================
+   DEFAULT DATE
+====================================================== */
+
+window.addEventListener(
+    "load",
+    function() {
+
+        const today =
+            new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+        document
+            .getElementById("letterDate")
+            .value =
+            today;
+
+    }
+);
+
+</script>
+
+</body>
+</html>
+```
